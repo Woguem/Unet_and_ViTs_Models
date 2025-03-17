@@ -160,33 +160,33 @@ class UNet(nn.Module):
         self.num_classes = num_classes  # Number of probability classes
         self.num_coordinates = num_coordinates  # Number of coordinates
 
-        # Encodeur : Couches convolutionnelles pour extraire les caractéristiques
+        # Encodeur 
         self.encoder1 = self.conv_block(3, 64)
         self.encoder2 = self.conv_block(64, 128)
         self.encoder3 = self.conv_block(128, 256)
         self.encoder4 = self.conv_block(256, 512)
-        self.encoder5 = self.conv_block(512, 1024)  # Dernière couche de l'encodeur
+        self.encoder5 = self.conv_block(512, 1024)  # Last layer of encodeur
 
-        # Décodeur : Couches de transposition de convolution pour reconstruire la taille
+        # Decodeur 
         self.decoder5 = self.upconv_block(1024, 512)
         self.decoder4 = self.upconv_block(512, 256)
         self.decoder3 = self.upconv_block(256, 128)
         self.decoder2 = self.upconv_block(128, 64)
         self.decoder1 = self.upconv_block(64, 64)
 
-        # Couches de régression pour prédire les positions des dislocations
-        # Fully connected layers
+        # Regression head
+        
         flattened_size = 64 * 3 * 3  # Size after convolutions
         self.fc1 = nn.Linear(flattened_size, 256)
 
-        # Classification output variable (num_classes = 2 (p0, p1), for each dislocation) 
+        # Classification Head
         self.classification_head = nn.Linear(256, max_total_disl * self.num_classes)  
 
         # Regression output variable (num_coordinates = 2 (x, y), for each dislocation)
         self.regression_head = nn.Linear(256, max_total_disl * self.num_coordinates)  # output = torch.tensor([[x1_1, y1_1, x2_1, y2_1, x3_1, y3_1]])  # 1 image, 3 dislocations, 2 coordinates (x, y) per dislocation
 
 
-        # Initialisation des poids
+        # He Initialisation 
         self.apply(initialize_weights_he)
 
     def conv_block(self, in_channels, out_channels):
@@ -214,7 +214,7 @@ class UNet(nn.Module):
         enc4 = self.encoder4(enc3)
         enc5 = self.encoder5(enc4)  # bottleneck
 
-        # Décodeur
+        # Decodeur
         dec5 = self.decoder5(enc5)
         dec4 = self.decoder4(dec5 + enc4)  # skip connection
         dec3 = self.decoder3(dec4 + enc3)  # skip connection

@@ -158,38 +158,38 @@ class ViTForDislocationLocalization(nn.Module):
     def __init__(self, num_classes, num_coordinates, max_total_disl=40):
         super(ViTForDislocationLocalization, self).__init__()
 
-        self.num_classes = num_classes  # Nombre de classes pour la classification
-        self.num_coordinates = num_coordinates  # Nombre de coordonnées pour la régression
-        self.max_total_disl = max_total_disl  # Nombre maximal de dislocations
+        self.num_classes = num_classes  
+        self.num_coordinates = num_coordinates  
+        self.max_total_disl = max_total_disl  
 
-        # Charger le modèle ViT pré-entraîné
+        # Load ViT pre-trainned model 
         self.vit = models.vision_transformer.vit_b_16(pretrained=True)  # ViT-B/16
-        self.vit.heads = nn.Identity()  # Supprimer la tête de classification
+        self.vit.heads = nn.Identity()  # delet the head of classification
 
-        # Tête pour la classification des dislocations
-        self.classification_head = nn.Linear(768, max_total_disl * self.num_classes)  # Sortie = 768 pour ViT
+        # Classification head
+        self.classification_head = nn.Linear(768, max_total_disl * self.num_classes)  
 
-        # Tête pour la régression des coordonnées (x, y)
-        self.regression_head = nn.Linear(768, max_total_disl * self.num_coordinates)  # 2 coordonnées (x, y)
+        # Rgression head
+        self.regression_head = nn.Linear(768, max_total_disl * self.num_coordinates)  
 
-        # Initialisation He pour les couches linéaires et de convolution
+        # He initialisation
         #self.apply(self.initialize_weights_he)
 
     def forward(self, x, padded_positions):
-        # Passer les images dans le ViT
+        # forward images in ViT
         x = self.vit(x)
         
-        # Classification des dislocations
-        classification_logits = self.classification_head(x)  # Prédiction des probabilités de chaque classe
+        # Classification head
+        classification_logits = self.classification_head(x)  
         
-        # Adapter la forme de la sortie pour correspondre à max_dislocations_in_batch
-        max_dislocations_in_batch = padded_positions.size(1)  # Calcul dynamique basé sur chaque batch
+        
+        max_dislocations_in_batch = padded_positions.size(1)  
         classification_logits = classification_logits[:, :max_dislocations_in_batch * self.num_classes].view(-1, max_dislocations_in_batch, self.num_classes)
 
         
-        # Régression des coordonnées (x, y)
-        regression_output = self.regression_head(x)  # Prédiction des coordonnées
-        regression_output = regression_output[:, :max_dislocations_in_batch * self.num_coordinates].view(-1, max_dislocations_in_batch, self.num_coordinates) # output = torch.tensor([[x1_1, y1_1], [x2_1, y2_1], [x3_1, y3_1]])  # 1 image, 3 dislocations, 2 coordonnées (x, y) par dislocation
+        # Regression head
+        regression_output = self.regression_head(x)  
+        regression_output = regression_output[:, :max_dislocations_in_batch * self.num_coordinates].view(-1, max_dislocations_in_batch, self.num_coordinates) # output = torch.tensor([[x1_1, y1_1], [x2_1, y2_1], [x3_1, y3_1]])  # 1 image, 3 dislocations, 2 coordonnées (x, y) per dislocation
 
 
         return classification_logits, regression_output

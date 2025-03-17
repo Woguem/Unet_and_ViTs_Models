@@ -1,7 +1,7 @@
 """
 @author: Dr Yen Fred WOGUEM 
 
-@description: This script trains a CNN model to predict dislocation coordinates and their probability of presence
+@description: This script use a pretrained ViT-B/16 model to predict dislocation coordinates and their probability of presence
 
 """
 
@@ -145,7 +145,7 @@ def custom_collate(batch):
 
 
 # ==============================
-# 3️ Definition of the CNN Model
+# 3️ Definition of the Transformers Model
 # ==============================
 '''def initialize_weights_he(m):
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):

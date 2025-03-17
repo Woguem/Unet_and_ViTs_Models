@@ -151,7 +151,7 @@ def custom_collate(batch):
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
         init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
         if m.bias is not None:
-            init.zeros_(m.bias)  # Initialiser le biais à zéro'''
+            init.zeros_(m.bias)  # Initialise biais to zero'''
 
 
 class ViTForDislocationLocalization(nn.Module):

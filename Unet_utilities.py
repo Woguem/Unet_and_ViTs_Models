@@ -151,7 +151,7 @@ def initialize_weights_he(m):
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
         init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
         if m.bias is not None:
-            init.zeros_(m.bias)  # Initialiser le biais à zéro
+            init.zeros_(m.bias)  # Initialise biais to zero
 
 class UNet(nn.Module):
     def __init__(self, num_classes, num_coordinates, max_total_disl=40):
